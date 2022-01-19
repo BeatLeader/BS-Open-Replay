@@ -62,13 +62,18 @@ JSON file with such structure:
             p: { // Position
               x:, y:, z:
             }  
-        }
+        },
+        a: ,     // float. Frame time
+        i:       // int. Player FPS 
     }], 
-    scores: ,      // [int]. Score for every note. -5 - wall, -4 - bomb, -3 - miss, -2 - badcut, 1 to 115 - normal score. Walls are the last.
-    combos: ,      // [int]. Combo for every note.
-    noteTime: ,    // [float]. Time each note was cut. In seconds.
-    noteInfos: ,   // [string]. Note type and position. Concatenated four ints: lineIndex + lineLayer + cutDirection + type
-    dynamicHeight: // [float]. Player dynamic height value. Can be empty if user uses static height. 
+    scores: ,        // [int]. Score for every note. -5 - wall, -4 - bomb, -3 - miss, -2 - badcut, 1 to 115 - normal score. Walls are the last.
+    combos: ,        // [int]. Combo for every note.
+    noteTime: ,      // [float]. Time each note was cut. In seconds.
+    noteInfos: ,     // [string]. Note type and position. Concatenated four ints: lineIndex + lineLayer + cutDirection + type
+    dynamicHeight: [{// Player dynamic height value. Can be empty if user uses static height. 
+      h:             // float. Height
+      a:             // float. Time
+    }]
 }
 ```
 
