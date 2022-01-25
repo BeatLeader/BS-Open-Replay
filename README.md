@@ -2,7 +2,7 @@
 
 BeatSaber open replay format.
 
-# Current format
+# Current format (bad and )
 
 ## Origin
 
@@ -10,12 +10,29 @@ Parsed ScoreSaber replays for good ranked plays. You can use ScoreSaber leaderbo
 
 ## API
 
+### ScoreSaber download
+
 https://sspreviewdecode.azurewebsites.net/?playerID=playerID&songID=songID
 
 Where:
 
 - playerID is Steam or Oculus id of player.
 - songID is ScoreSaber leaderboardID.
+
+### Custom URL download
+
+https://sspreviewdecode.azurewebsites.net/?link=link
+
+Where:
+
+- link is direct download link to replay.
+Example: https://cdn.discordapp.com/attachments/921820046345523314/934953493624660058/76561198059961776-Cheshires_dance-ExpertPlus-Standard-A2B943FE75E48394352B4FD912CEE8306788D0B1.dat
+
+### Custom file
+
+POST request with replay file in body
+
+https://sspreviewdecode.azurewebsites.net
 
 ## Format
 
@@ -32,11 +49,6 @@ JSON file with such structure:
         noteJumpStartBeatOffset: , // float. Offset to calculate JD value.
         leftHanded: ,              // bool. Left handed play, all the notes is mirrored
         height: ,                  // float. Player static height
-        rr: ,                      // float. Room rotation
-        room: {                    // Room offsets
-            x:, y:, z:
-        },
-        st:                        // float
     }
     frames: [{   // One for the each frame of the replay
         h: {     // Head 
