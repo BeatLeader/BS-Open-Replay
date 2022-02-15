@@ -2,7 +2,127 @@
 
 BeatSaber open replay format.
 
-# Current format (bad and )
+# BSOR V1
+
+Beat Saber Open Replay
+.bsor
+- [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/2_Core/Models/Replay.cs)
+- [JS code](https://github.com/NSGolova/BeatSaber-Web-Replays/blob/nsgolova/openreplay/src/open-replay-decoder.js)
+
+Binary file with the such structure:
+
+```
+0x442d3d69                    - int, unique magic number.
+1                             - byte, file version.
+
+0                             - byte, info structure start.
+{                             - Info structure
+  version                     - string, Mod version
+  gameVersion                 - string, Game version
+  timestamp;                  - string, play start unix timestamp.
+  
+  playerID;
+  playerName;
+  platform;
+
+  trackingSytem;
+  hmd;
+  controller;
+
+  hash;
+  songName;
+  mapper;
+  difficulty;
+
+  score                        - int, total modified score.
+  mode                         - string, game mode. (Standard, OneSaber, Lawless, etc.)
+  environment                  - string, environment name. (The beginning, etc.)
+  modifiers                    - comma separated string, game modifiers. (FS, GN, etc.)
+  jumpDistance                 - float, note jump distance.
+  leftHanded                   - bool
+  height                       - float, static height
+
+  startTime                    - float, song start time (practice mode).
+  failTime                     - float, song fail time (only if failed).
+  speed                        - float, song speed (practice mode).
+}
+
+1                              - byte, frames array start.
+framesCount                    - int, frames count.
+{                              - Frame structure
+  time                         - float, song time
+  fps                          - int, player's FPS
+  {                            - Head structure
+    {x, y, z}                  - 3 floats, position.
+    {x, y, z, w}               - 4 floats, rotation.
+  }
+  {                            - Left hand structure
+    {x, y, z}                  - 3 floats, position.
+    {x, y, z, w}               - 4 floats, rotation.
+  }
+  {                            - Right hand structure
+    {x, y, z}                  - 3 floats, position.
+    {x, y, z, w}               - 4 floats, rotation.
+  }
+}
+
+2                              - byte, note events array start.
+noteCount                      - int, note events count.
+{                              - Note event structure.
+  noteID                       - int, lineIndex*1000 + noteLineLayer*100 + colorType*10 + cutDirection
+  eventTime                    - float, song time of event 
+  spawnTime                    - float, spawn time of note
+  eventType                    - int, good = 0,bad = 1,miss = 2,bomb = 3
+  {                            - Cut info structure (only for Good and Bad!)
+    bool speedOK;
+    bool directionOK;
+    bool saberTypeOK;
+    bool wasCutTooSoon;
+    float saberSpeed;
+    Vector3 saberDir;
+    int saberType;
+    float timeDeviation;
+    float cutDirDeviation;
+    Vector3 cutPoint;
+    Vector3 cutNormal;
+    float cutDistanceToCenter;
+    float cutAngle;
+    float beforeCutRating;
+    float afterCutRating;
+  }
+}
+
+3                              - byte, wall events array start
+wallCount                      - int, wall events count
+{
+  wallID                       - int, lineIndex*100 + obstacleType*10 + width
+  energy                       - float, energy at the end of event
+  time                         - float, song time of event 
+  spawnTime                    - float, spawn time of wall
+}
+
+4                              - byte, automatic height array start
+heightCount                    - int, height change events count
+{
+  height                       - float, height value
+  time                         - float, song time
+}
+
+5                              - byte, pause array start
+pauseCount                     - int, pauses count
+{
+  duration                     - long, duration in milliseconds
+  time                         - float, pause start time
+}
+```
+
+# OPA V1
+
+Opennes Protection Algorhitm.
+
+Server hosted algorhitm requiring database and authentication. 
+
+# Legacy format (ScoreSaber based)
 
 ## Origin
 
