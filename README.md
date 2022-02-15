@@ -1,15 +1,13 @@
 # BS Open Replay
 
-BeatSaber open replay format.
+Beat Saber open replay format.
 
 # BSOR V1
 
-Beat Saber Open Replay
-.bsor
 - [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/2_Core/Models/Replay.cs)
 - [JS code](https://github.com/NSGolova/BeatSaber-Web-Replays/blob/nsgolova/openreplay/src/open-replay-decoder.js)
 
-Binary file with the such structure:
+## Structure
 
 ```
 0x442d3d69                    - int, unique magic number.
@@ -111,16 +109,40 @@ heightCount                    - int, height change events count
 5                              - byte, pause array start
 pauseCount                     - int, pauses count
 {
-  duration                     - long, duration in milliseconds
+  duration                     - int, duration in milliseconds
   time                         - float, pause start time
 }
 ```
 
+## .bsor Encoding details
+Binary file containing only values without the keys. Values are coded one after another.
+Uses Little Endian!
+
+- byte, 1 byte
+- int, 4 bytes
+- float, 4 bytes
+- bool, 1 byte
+- string, int (count) + count bytes 
+
 # OPA V1
 
-Opennes Protection Algorhitm.
+Openness Protection Algorithm.
 
-Server hosted algorhitm requiring database and authentication. 
+Server hosted algorithm requiring database and authentication.
+
+- [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/2_Core/Models/Replay.cs)
+
+## Generation
+
+- Server receives encoded replay as a byte array of length N.
+- N / 200 unique random numbers are generated from 0 to N.
+- These numbers(i) are used to get i % 4 bit of i byte and concatenate them all.
+- Resulting blob is saved to the database along with indexes related to map id.
+
+## Check
+
+The server gets all the indexes and blobs from the database when the new replay is posted. 
+The server gets a new blob by the same rule as for generation. If more than 40% of bits are the same - replay is not allowed.
 
 # Legacy format (ScoreSaber based)
 
