@@ -5,34 +5,35 @@ Beat Saber open replay format.
 # BSOR V1
 
 - [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/2_Core/Models/Replay.cs)
-- [JS code](https://github.com/NSGolova/BeatSaber-Web-Replays/blob/nsgolova/openreplay/src/open-replay-decoder.js)
+- [JS code](https://github.com/NSGolova/BeatSaber-Web-Replays/blob/master/src/open-replay-decoder.js)
+- [C++ code](https://github.com/BeatLeader/beatleader-qmod/blob/master/include/Models/Replay.hpp)
 
 ## Structure
 
 ```
-0x442d3d69                    - int, unique magic number.
-1                             - byte, file version.
+0x442d3d69                     - int, unique magic number.
+1                              - byte, file version.
 
-0                             - byte, info structure start.
-{                             - Info structure
-  version                     - string, Mod version
-  gameVersion                 - string, Game version
-  timestamp;                  - string, play start unix timestamp.
+0                              - byte, info structure start.
+{                              - Info structure
+  version                      - string, Mod version
+  gameVersion                  - string, Game version
+  timestamp;                   - string, play start unix timestamp.
   
-  playerID;
-  playerName;
-  platform;
+  playerID;                    - string, player platform unique id.
+  playerName;                  - string, player platform name.
+  platform;                    - string, oculus or steam.
 
-  trackingSytem;
-  hmd;
-  controller;
+  trackingSytem;               - string, tracking system type. (OpenVR, Oculus, etc.)
+  hmd;                         - string, headset type. (Oculus Quest, Valve Index, etc.)
+  controller;                  - string, controllers type. (Oculus touch, etc)
 
-  hash;
-  songName;
-  mapper;
-  difficulty;
+  hash;                        - string, map hash.
+  songName;                    - string, song name.
+  mapper;                      - string, mapper name.
+  difficulty;                  - string, difficulty name. (Easy, ExpertPlus, etc).
 
-  score                        - int, total modified score.
+  score                        - int, total unmodified score.
   mode                         - string, game mode. (Standard, OneSaber, Lawless, etc.)
   environment                  - string, environment name. (The beginning, etc.)
   modifiers                    - comma separated string, game modifiers. (FS, GN, etc.)
