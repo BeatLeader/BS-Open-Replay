@@ -185,7 +185,7 @@ JSON file with such structure:
     info: {
         version: ,                 // String. Version of the replay
         hash: ,                    // String. Song hash
-        difficulty: ,              // int. Song difficulty (1 - E, 3 - H, 5 - E, 7 - E+)
+        difficulty: ,              // int. Song difficulty (1 - E, 3 - N, 5 - H, 7 - E, 9 - E+)
         mode: ,                    // String. Game mode. (Standard, OneSaber, etc.)
         environment: ,             // String. Environment name (BigMirrorEnvironment, etc.)
         modifiers: ,               // [String]. Game modifiers. (GN, FS, etc.)
