@@ -128,9 +128,120 @@ namespace ReplayDecoder.BLReplay
 
     public struct Vector3
     {
+        public const float kEpsilonNormalSqrt = 1e-15F;
+        public const float kEpsilon = 0.00001F;
+
         public float x;
         public float y;
         public float z;
+
+        public Vector3(float v1, float v2, float v3) : this()
+        {
+            x = v1;
+            y = v2;
+            z = v3;
+        }
+
+        static readonly Vector3 zeroVector = new Vector3(0F, 0F, 0F);
+        static readonly Vector3 oneVector = new Vector3(1F, 1F, 1F);
+        static readonly Vector3 upVector = new Vector3(0F, 1F, 0F);
+        static readonly Vector3 downVector = new Vector3(0F, -1F, 0F);
+        static readonly Vector3 leftVector = new Vector3(-1F, 0F, 0F);
+        static readonly Vector3 rightVector = new Vector3(1F, 0F, 0F);
+        static readonly Vector3 forwardVector = new Vector3(0F, 0F, 1F);
+        static readonly Vector3 backVector = new Vector3(0F, 0F, -1F);
+        static readonly Vector3 positiveInfinityVector = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+        static readonly Vector3 negativeInfinityVector = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
+
+        public static Vector3 zero {  get { return zeroVector; } }
+        public static Vector3 one {  get { return oneVector; } }
+        public static Vector3 forward { get { return forwardVector; } }
+        public static Vector3 back { get { return backVector; } }
+        public static Vector3 up { get { return upVector; } }
+        public static Vector3 down { get { return downVector; } }
+        public static Vector3 left { get { return leftVector; } }
+        public static Vector3 right { get { return rightVector; } }
+        public static Vector3 positiveInfinity { get { return positiveInfinityVector; } }
+        public static Vector3 negativeInfinity { get { return negativeInfinityVector; } }
+
+
+        public static float Clamp01(float value)
+        {
+            if (value < 0.0) return 0.0f;
+            return value > 1.0f ? 1.0f : value;
+        }
+
+        public static float Clamp(float value, float a, float b)
+        {
+            if (value < a) return a;
+            return value > b ? b : value;
+        }
+
+        internal static Vector3 Lerp(Vector3 a, Vector3 b, float t)
+        {
+            t = Clamp01(t);
+            return new Vector3(
+                a.x + (b.x - a.x) * t,
+                a.y + (b.y - a.y) * t,
+                a.z + (b.z - a.z) * t
+            );
+        }
+
+        public static Vector3 Cross(Vector3 lhs, Vector3 rhs)
+        {
+            return new Vector3(
+                lhs.y * rhs.z - lhs.z * rhs.y,
+                lhs.z * rhs.x - lhs.x * rhs.z,
+                lhs.x * rhs.y - lhs.y * rhs.x);
+        }
+
+        public static float Magnitude(Vector3 vector) { return (float)Math.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z); }
+
+        public static Vector3 Normalize(Vector3 value)
+        {
+            float mag = Magnitude(value);
+            if (mag > kEpsilon)
+                return value / mag;
+            else
+                return zero;
+        }
+
+        public void Normalize()
+        {
+            float mag = Magnitude(this);
+            if (mag > kEpsilon)
+                this = this / mag;
+            else
+                this = zero;
+        }
+
+        // Returns this vector with a ::ref::magnitude of 1 (RO).
+        public Vector3 normalized
+        {
+            get { return Vector3.Normalize(this); }
+        }
+
+        public static float Dot(Vector3 lhs, Vector3 rhs) { return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z; }
+
+        public float sqrMagnitude { get { return x * x + y * y + z * z; } }
+
+        public static float Angle(Vector3 from, Vector3 to)
+        {
+            // sqrt(a) * sqrt(b) = sqrt(a * b) -- valid for real numbers
+            float denominator = (float)Math.Sqrt(from.sqrMagnitude * to.sqrMagnitude);
+            if (denominator < kEpsilonNormalSqrt)
+                return 0F;
+
+            float dot = Clamp(Dot(from, to) / denominator, -1F, 1F);
+            return ((float)Math.Acos(dot)) * 57.29577951f;
+        }
+
+        public static Vector3 operator +(Vector3 a, Vector3 b) { return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z); }
+        public static Vector3 operator -(Vector3 a, Vector3 b) { return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z); }
+        public static Vector3 operator -(Vector3 a) { return new Vector3(-a.x, -a.y, -a.z); }
+        public static Vector3 operator *(Vector3 a, float d) { return new Vector3(a.x * d, a.y * d, a.z * d); }
+        public static Vector3 operator *(float d, Vector3 a) { return new Vector3(a.x * d, a.y * d, a.z * d); }
+        public static Vector3 operator /(Vector3 a, float d) { return new Vector3(a.x / d, a.y / d, a.z / d); }
     }
 
     public struct Quaternion
@@ -139,6 +250,72 @@ namespace ReplayDecoder.BLReplay
         public float y;
         public float z;
         public float w;
+        private float v;
+
+        public Quaternion(float x, float y, float z, float v) : this()
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.v = v;
+        }
+
+        public static Vector3 operator *(Quaternion rotation, Vector3 point)
+        {
+            float x = rotation.x * 2F;
+            float y = rotation.y * 2F;
+            float z = rotation.z * 2F;
+            float xx = rotation.x * x;
+            float yy = rotation.y * y;
+            float zz = rotation.z * z;
+            float xy = rotation.x * y;
+            float xz = rotation.x * z;
+            float yz = rotation.y * z;
+            float wx = rotation.w * x;
+            float wy = rotation.w * y;
+            float wz = rotation.w * z;
+
+            Vector3 res;
+            res.x = (1F - (yy + zz)) * point.x + (xy - wz) * point.y + (xz + wy) * point.z;
+            res.y = (xy + wz) * point.x + (1F - (xx + zz)) * point.y + (yz - wx) * point.z;
+            res.z = (xz - wy) * point.x + (yz + wx) * point.y + (1F - (xx + yy)) * point.z;
+            return res;
+        }
+
+        public static Quaternion operator *(Quaternion lhs, Quaternion rhs)
+        {
+            return new Quaternion(
+                lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+                lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z,
+                lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x,
+                lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z);
+        }
+
+        internal static Quaternion Lerp(Quaternion a, Quaternion b, float t)
+        {
+            t = Vector3.Clamp01(t);
+            return new Quaternion(
+                a.x + (b.x - a.x) * t,
+                a.y + (b.y - a.y) * t,
+                a.z + (b.z - a.z) * t,
+                a.w + (b.w - a.w) * t
+            );
+        }
+
+        public static Quaternion AngleAxis(float aAngle, Vector3 aAxis)
+        {
+            aAxis.Normalize();
+            float rad = aAngle * 57.29577951f * 0.5f;
+            aAxis = aAxis * (float)Math.Sin(rad);
+            return new Quaternion(aAxis.x, aAxis.y, aAxis.z, (float)Math.Cos(rad));
+        }
+
+        public static Quaternion FromToRotation(Vector3 aFrom, Vector3 aTo)
+        {
+            Vector3 axis = Vector3.Cross(aFrom, aTo);
+            float angle = Vector3.Angle(aFrom, aTo);
+            return Quaternion.AngleAxis(angle, axis.normalized);
+        }
     }
 
     public class Transform
