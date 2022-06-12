@@ -110,7 +110,7 @@ heightCount                    - int, height change events count
 5                              - byte, pause array start
 pauseCount                     - int, pauses count
 {
-  duration                     - int, duration in milliseconds
+  duration                     - long, duration in seconds
   time                         - float, pause start time
 }
 ```
