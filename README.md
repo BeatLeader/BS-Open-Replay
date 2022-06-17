@@ -7,6 +7,7 @@ Beat Saber open replay format.
 - [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/2_Core/Models/Replay.cs)
 - [JS code](https://github.com/NSGolova/BeatSaber-Web-Replays/blob/master/src/open-replay-decoder.js)
 - [C++ code](https://github.com/BeatLeader/beatleader-qmod/blob/master/include/Models/Replay.hpp)
+- [Go code](https://github.com/motzel/go-bsor/blob/master/bsor/bsor.go)
 
 ## Structure
 
@@ -155,7 +156,7 @@ Parsed ScoreSaber replays for good ranked plays. You can use ScoreSaber leaderbo
 
 ### ScoreSaber download
 
-https://sspreviewdecode.azurewebsites.net/?playerID=playerID&songID=songID
+https://ssdecode.azurewebsites.net/?playerID=playerID&songID=songID
 
 Where:
 
@@ -164,7 +165,7 @@ Where:
 
 ### Custom URL download
 
-https://sspreviewdecode.azurewebsites.net/?link=link
+https://ssdecode.azurewebsites.net/?link=link
 
 Where:
 
@@ -175,7 +176,7 @@ Example: https://cdn.discordapp.com/attachments/921820046345523314/9349534936246
 
 POST request with replay file in body
 
-https://sspreviewdecode.azurewebsites.net
+https://ssdecode.azurewebsites.net
 
 ## Format
 
