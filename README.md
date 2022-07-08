@@ -69,7 +69,8 @@ framesCount                    - int, frames count.
 2                              - byte, note events array start.
 noteCount                      - int, note events count.
 {                              - Note event structure.
-  noteID                       - int, lineIndex*1000 + noteLineLayer*100 + colorType*10 + cutDirection
+  noteID                       - int, scoringType*10000 + lineIndex*1000 + noteLineLayer*100 + colorType*10 + cutDirection.  
+    Where scoringType is Normal = 0, Ignore = 1, NoScore = 2, Normal = 3, SliderHead = 4, SliderTail = 5, BurstSliderHead = 6, BurstSliderElement = 7
   eventTime                    - float, song time of event 
   spawnTime                    - float, spawn time of note
   eventType                    - int, good = 0,bad = 1,miss = 2,bomb = 3
