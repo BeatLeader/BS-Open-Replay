@@ -1,81 +1,81 @@
-﻿using ReplayDecoder.BLReplay;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using ReplayDecoder.BLReplay;
 using System;
+using System.Dynamic;
 using System.IO;
+using System.IO.Compression;
+using System.Net;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using NumSharp;
+using System.Collections.Generic;
 
 namespace ReplayDecoder
 {
     static class Program
     {
         [STAThread]
-        static void Main()
+        async static Task Main(string[] args)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "BS Open Replay |*.bsor";
-            if (ofd.ShowDialog() != DialogResult.OK)
-                return;
 
-            Stream stream = File.Open(ofd.FileName, FileMode.Open);
-            byte[] replayData;
+            string[] files =
+            Directory.GetFiles("\\replays", "*.bsor", SearchOption.AllDirectories);
 
-            DateTime start = DateTime.Now;
+            (List<List<List<float>>> xs, List<float> ys) = (new List<List<List<float>>>(), new List<float>());
+            
 
-            for (int i = 0; i < 10000; i++)
+            for (int f = 0; f < files.Length; f++)
             {
-                using (var ms = new MemoryStream(5))
-                {
-                    stream.CopyTo(ms);
-                    long length = ms.Length;
-                    replayData = ms.ToArray();
-                }
+                try {
+                Stream stream = File.Open(files[f], FileMode.Open);
+                byte[] replayData;
+
+                int arrayLength = (int)stream.Length;
+                byte[] buffer = new byte[arrayLength];
+                int file = stream.Read(buffer, 0, arrayLength);
+
+                Replay replay = BLReplay.ReplayDecoder.Decode(buffer);
+                ScoreStatistic statistic = ReplayStatisticUtils.ProcessReplay(replay);
+
+                
+
+                (var xxs, var yys) = statistic.Groups;
+
+                xs.AddRange(xxs);
+                ys.AddRange(yys);
+                } catch { }
+
+                
             }
 
-            DateTime end = DateTime.Now;
+            var x = np.zeros(new Shape(xs.Count, 13, 13, 1));
+            var y = np.zeros(new Shape(xs.Count, 1));
 
-            DateTime start2 = DateTime.Now;
-
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < xs.Count; i++)
             {
-                using (var ms = new MemoryStream(5))
+                for (int j = 0; j < 13; j++)
                 {
-                    stream.CopyTo(ms);
-                    long length = ms.Length;
-                    replayData = ms.ToArray();
+
+                    for (int z = 0; z < 13; z++)
+                    {
+                        if (j < xs[i].Count) {
+
+                            x[i][j][z][0] = xs[i][j][z];
+                        } else {
+                            x[i][j][z][0] = 0;
+                        }
+                    }
                 }
+
+                y[i][0] = ys[i];
             }
 
-            DateTime end2 = DateTime.Now;
+            xs = null;
+            ys = null;
 
-            DateTime start3 = DateTime.Now;
-
-            for (int i = 0; i < 10000; i++)
-            {
-                using (var ms = new MemoryStream(5))
-                {
-                    stream.CopyTo(ms);
-                    long length = ms.Length;
-                    replayData = ms.ToArray();
-                }
-            }
-
-            DateTime end3 = DateTime.Now;
-            Console.WriteLine(" {0} ms | {1} ms | {2} ms", (end - start).TotalMilliseconds, (end2 - start2).TotalMilliseconds, (end3 - start3).TotalMilliseconds);
-
-            int arrayLength = (int)stream.Length;
-            byte[] buffer = new byte[arrayLength];
-            int file = stream.Read(buffer, 0, arrayLength);
-
-            Replay replay = BLReplay.ReplayDecoder.Decode(buffer);
-
-            int score1 = replay.info.score;
-            int score2 = ScoreCalculator.CalculateScoreFromReplay(replay);
-            ScoreStatistic statistic = ReplayStatisticUtils.ProcessReplay(replay);
-            int score3 = statistic.WinTracker.TotalScore;
-
-            var velocityStats = Bakery.VelocityStats(replay);
-
-            // For breakpoint
-            Console.WriteLine(score1 + "  " + score2 + "  " + score3);
+            np.save("\\replays\\xs.npy", x);
+            np.save("\\replays\\ys.npy", y);
         }
     }
 }

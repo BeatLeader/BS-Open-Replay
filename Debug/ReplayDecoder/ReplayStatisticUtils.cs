@@ -75,6 +75,8 @@ namespace ReplayDecoder
         public AccuracyTracker AccuracyTracker { get; set; }
         public WinTracker WinTracker { get; set; }
         public ScoreGraphTracker ScoreGraphTracker { get; set; }
+
+        public (List<List<List<float>>>, List<float>) Groups { get; set; }
     }
     public class NoteParams
     {
@@ -129,6 +131,8 @@ namespace ReplayDecoder
         public int totalScore;
         public float accuracy;
         public int combo;
+
+        public NoteEvent noteEvent;
     }
 
     class ReplayStatisticUtils
@@ -191,8 +195,73 @@ namespace ReplayDecoder
             result.WinTracker.TotalScore = structs.Last().totalScore;
             result.AccuracyTracker = accuracy;
             result.ScoreGraphTracker = ScoreGraph(structs);
+            result.Groups = Groups(structs);
 
             return result;
+        }
+
+        public static (List<List<List<float>>>, List<float>) Groups(List<NoteStruct> noteStructs) {
+
+            var resultX = new List<List<List<float>>>();
+            var resultY = new List<float>();
+
+            var groups = noteStructs.Where(n => n.isBlock).GroupBy(n => n.noteEvent.spawnTime).OrderBy(key => key.Key);
+            List<(float, List<NoteStruct>)> groupList = new List<(float, List<NoteStruct>)>();
+            foreach (var item in groups)
+            {
+                groupList.Add((item.Key, item.ToList()));
+            }
+
+
+            int start = 0;
+            int finish = groupList.Count() > 13 ? 13 : groupList.Count();
+            
+            do {
+                var window = new List<List<float>>();
+                for (int i = start; i < finish; i++) {
+                    
+                    (float, List <NoteStruct>)? lastGroup = i == 0 ? null : groupList[i - 1];
+                    List<float> list = new List<float>();
+                    for (int j = 0; j < 13; j++) { list.Add(0); }
+
+                    if (groupList[i].Item2.Count > 3) {
+                        var p = 3;
+                    }
+
+                    foreach (var item in groupList[i].Item2.OrderBy(n => n.noteEvent.noteID))
+                    {
+                        NoteParams param = new NoteParams(item.noteEvent.noteID);
+
+                        int id = (param.scoringType == ScoringType.Default ? 3 : (int)param.scoringType) * 100 + param.cutDirection * 10 + param.colorType;
+
+                        list[param.noteLineLayer * 4 + param.lineIndex] = ((float)id) / 1000.0f;
+                    }
+
+                    list[12] = lastGroup != null ? (groupList[i].Item1 - lastGroup.Value.Item1) : groupList[i].Item1;
+
+                    lastGroup = groupList[i];
+
+                    window.Add(list);
+                }
+
+                resultX.Add(window);
+
+                resultY.Add((groupList[finish - 1].Item2.Average(n => n.accuracy) - groupList[start].Item2.Average(n => n.accuracy) + 1.0f) / 5.0f);
+
+                if (finish >= groupList.Count()) {
+                    break;
+                } else {
+                    start += 4;
+                    finish += 4;
+                    if (finish > groupList.Count()) {
+                        finish = groupList.Count();
+                    }
+                }
+
+            } while (true);
+
+
+            return (resultX, resultY);
         }
 
         public static (AccuracyTracker, List<NoteStruct>, int) Accuracy(Replay replay)
@@ -283,6 +352,7 @@ namespace ReplayDecoder
                     isBlock = param.colorType != 2,
                     score = scoreValue,
                     scoringType = param.scoringType,
+                    noteEvent = note,
                 });
             }
 
