@@ -4,7 +4,7 @@ Beat Saber open replay format.
 
 # BSOR V1
 
-- [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/2_Core/Models/Replay.cs)
+- [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/Source/2_Core/Models/Replay.cs)
 - [JS code](https://github.com/BeatLeader/BeatSaber-Web-Replays/blob/master/src/open-replay-decoder.js)
 - [C++ code](https://github.com/BeatLeader/beatleader-qmod/blob/master/include/Models/Replay.hpp)
 - [Python code](https://github.com/Schippi/py-bsor/blob/main/src/bsor/Bsor.py)
