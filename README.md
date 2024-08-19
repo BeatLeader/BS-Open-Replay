@@ -124,6 +124,20 @@ pauseCount                     - int, pauses count
   duration                     - long, duration in seconds
   time                         - float, pause start time
 }
+6                              - byte, start of controller offsets, *OPTIONAL*
+{                              - Left hand structure
+   {x, y, z}                   - 3 floats, position.
+   {x, y, z, w}                - 4 floats, rotation.
+}
+{                              - Right hand structure
+   {x, y, z}                   - 3 floats, position.
+   {x, y, z, w}                - 4 floats, rotation.
+}
+7                              - byte, start of user data, *OPTIONAL*
+userDataLength                 - int, length of userdata
+{
+ content                       - byte, variable meaning
+}
 ```
 
 ## .bsor Encoding details
