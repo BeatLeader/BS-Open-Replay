@@ -5,6 +5,10 @@ Beat Saber open replay format.
 # BSOR V1
 
 - [C# code](https://github.com/BeatLeader/BS-Open-Replay/blob/master/Debug/ReplayDecoder/Replay.cs)
+- [JS code](https://github.com/BeatLeader/BeatSaber-Web-Replays/blob/master/src/open-replay-decoder.js)
+- [C++ code](https://github.com/BeatLeader/beatleader-qmod/blob/master/shared/Models/Replay.hpp)
+- [Python code](https://github.com/Schippi/py-bsor/blob/main/src/bsor/Bsor.py)
+- [Go code](https://github.com/motzel/go-bsor/blob/master/bsor/bsor.go)
 
 ## Structure
 
@@ -22,19 +26,19 @@ Beat Saber open replay format.
   playerName;                  - string, player platform name.
   platform;                    - string, oculus or steam.
 
-  trackingSytem;               - string, tracking system type. (OpenVR, Oculus, etc.).
-  hmd;                         - string, headset type. (Oculus Quest, Valve Index, etc.).
-  controller;                  - string, controllers type. (Oculus touch, etc).
+  trackingSytem;               - string, tracking system type. (OpenVR, Oculus, etc.)
+  hmd;                         - string, headset type. (Oculus Quest, Valve Index, etc.)
+  controller;                  - string, controllers type. (Oculus touch, etc)
 
   hash;                        - string, map hash.
   songName;                    - string, song name.
   mapper;                      - string, mapper name.
-  difficulty;                  - string, difficulty name. (Easy, ExpertPlus, etc).
+  difficulty;                  - string, difficulty name. (Easy, ExpertPlus, etc)
 
   score                        - int, total unmodified score.
-  mode                         - string, game mode. (Standard, OneSaber, Lawless, etc.).
-  environment                  - string, environment name. (The beginning, etc.).
-  modifiers                    - comma separated string, game modifiers. (FS, GN, etc.).
+  mode                         - string, game mode. (Standard, OneSaber, Lawless, etc.)
+  environment                  - string, environment name. (The beginning, etc.)
+  modifiers                    - comma separated string, game modifiers. (FS, GN, etc.)
   jumpDistance                 - float, note jump distance.
   leftHanded                   - bool.
   height                       - float, static height.
@@ -51,15 +55,15 @@ framesCount                    - int, frames count.
   fps                          - int, player's FPS.
   {                            - Head structure.
     {x, y, z}                  - 3 floats, position.
-    {x, y, z, w}               - 4 floats, rotation (in quaternion form).
+    {x, y, z, w}               - 4 floats, rotation.
   }
   {                            - Left hand structure.
     {x, y, z}                  - 3 floats, position.
-    {x, y, z, w}               - 4 floats, rotation (in quaternion form).
+    {x, y, z, w}               - 4 floats, rotation.
   }
   {                            - Right hand structure.
     {x, y, z}                  - 3 floats, position.
-    {x, y, z, w}               - 4 floats, rotation (in quaternion form).
+    {x, y, z, w}               - 4 floats, rotation.
   }
 }
 
@@ -85,16 +89,16 @@ noteCount                      - int, note events count.
     saberTypeOK                - bool, note was hit with correct saber.
     wasCutTooSoon              - bool, note was cut too soon.
     saberSpeed                 - float, speed of the saber.
-    { x, y, z }                - 3 floats, direction of the saber.
+    { x, y, z }                - 3 floats, saberDir, direction of the saber.
     saberType                  - int, type of the saber (0 = left, 1 = right).
     timeDeviation              - float, how far away the time hit was from the time expected.
     cutDirDeviation            - float, how far away the cut direction was from the one expected.
-    { x, y, z }                - 3 floats, point at which the note was cut.
-    { x, y, z }                - 3 floats, cut normal vector.
-    cutDistanceToCenter        - float, distance from center of the cut.
+    { x, y, z }                - 3 floats, cutPoint, point at which the note was cut.
+    { x, y, z }                - 3 floats, cutNormal, cut normal vector.
+    cutDistanceToCenter        - float, distance from center of the note to the cut plane, to get the score 15 * (1 - Clamp01(cutDistanceToCenter / 0.3f)). With beforeCutRating and afterCutRating forms 115 score.
     cutAngle                   - float, angle of the cut.
-    beforeCutRating            - float.
-    afterCutRating             - float.
+    beforeCutRating            - float, angle rating before the cut. This rating is uncapped (can go over 1). 1 means 70 score.
+    afterCutRating             - float, angle rating after the cut. This rating is uncapped (can go over 1). 1 means 30 score.
   }
 }
 
@@ -145,7 +149,9 @@ Uses Little Endian!
 - long, 8 bytes
 - float, 4 bytes
 - bool, 1 byte
-- string, int (count) + count bytes 
+- string, int (count) + count bytes
+
+Rotations are stored as quaternions.
 
 # Legacy format (ScoreSaber based)
 
