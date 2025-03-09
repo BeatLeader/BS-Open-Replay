@@ -4,9 +4,9 @@ Beat Saber open replay format.
 
 # BSOR V1
 
-- [C# code](https://github.com/BeatLeader/beatleader-mod/blob/master/Source/2_Core/Models/Replay.cs)
+- [C# code](https://github.com/BeatLeader/BS-Open-Replay/blob/master/Debug/ReplayDecoder/Replay.cs)
 - [JS code](https://github.com/BeatLeader/BeatSaber-Web-Replays/blob/master/src/open-replay-decoder.js)
-- [C++ code](https://github.com/BeatLeader/beatleader-qmod/blob/master/include/Models/Replay.hpp)
+- [C++ code](https://github.com/BeatLeader/beatleader-qmod/blob/master/shared/Models/Replay.hpp)
 - [Python code](https://github.com/Schippi/py-bsor/blob/main/src/bsor/Bsor.py)
 - [Go code](https://github.com/motzel/go-bsor/blob/master/bsor/bsor.go)
 
@@ -17,9 +17,9 @@ Beat Saber open replay format.
 1                              - byte, file version.
 
 0                              - byte, info structure start.
-{                              - Info structure
-  version                      - string, Mod version
-  gameVersion                  - string, Game version
+{                              - Info structure.
+  version                      - string, Mod version.
+  gameVersion                  - string, Game version.
   timestamp;                   - string, play start unix timestamp.
   
   playerID;                    - string, player platform unique id.
@@ -33,15 +33,15 @@ Beat Saber open replay format.
   hash;                        - string, map hash.
   songName;                    - string, song name.
   mapper;                      - string, mapper name.
-  difficulty;                  - string, difficulty name. (Easy, ExpertPlus, etc).
+  difficulty;                  - string, difficulty name. (Easy, ExpertPlus, etc)
 
   score                        - int, total unmodified score.
   mode                         - string, game mode. (Standard, OneSaber, Lawless, etc.)
   environment                  - string, environment name. (The beginning, etc.)
   modifiers                    - comma separated string, game modifiers. (FS, GN, etc.)
   jumpDistance                 - float, note jump distance.
-  leftHanded                   - bool
-  height                       - float, static height
+  leftHanded                   - bool.
+  height                       - float, static height.
 
   startTime                    - float, song start time (practice mode).
   failTime                     - float, song fail time (only if failed).
@@ -50,18 +50,18 @@ Beat Saber open replay format.
 
 1                              - byte, frames array start.
 framesCount                    - int, frames count.
-{                              - Frame structure
-  time                         - float, song time
-  fps                          - int, player's FPS
-  {                            - Head structure
+{                              - Frame structure.
+  time                         - float, song time.
+  fps                          - int, player's FPS.
+  {                            - Head structure.
     {x, y, z}                  - 3 floats, position.
     {x, y, z, w}               - 4 floats, rotation.
   }
-  {                            - Left hand structure
+  {                            - Left hand structure.
     {x, y, z}                  - 3 floats, position.
     {x, y, z, w}               - 4 floats, rotation.
   }
-  {                            - Right hand structure
+  {                            - Right hand structure.
     {x, y, z}                  - 3 floats, position.
     {x, y, z, w}               - 4 floats, rotation.
   }
@@ -70,7 +70,7 @@ framesCount                    - int, frames count.
 2                              - byte, note events array start.
 noteCount                      - int, note events count.
 {                              - Note event structure.
-  noteID                       - int, scoringType*10000 + lineIndex*1000 + noteLineLayer*100 + colorType*10 + cutDirection.  
+  noteID                       - int, scoringType*10000 + lineIndex*1000 + noteLineLayer*100 + colorType*10 + cutDirection.
       Where scoringType is game value + 2. Standard values: 
         Normal = 0, 
         Ignore = 1, 
@@ -80,63 +80,63 @@ noteCount                      - int, note events count.
         SliderTail = 5, 
         BurstSliderHead = 6, 
         BurstSliderElement = 7
-  eventTime                    - float, song time of event 
-  spawnTime                    - float, spawn time of note
-  eventType                    - int, good = 0,bad = 1,miss = 2,bomb = 3
-  {                            - Cut info structure (only for Good and Bad!)
-    bool speedOK;
-    bool directionOK;
-    bool saberTypeOK;
-    bool wasCutTooSoon;
-    float saberSpeed;
-    Vector3 saberDir;
-    int saberType;
-    float timeDeviation;
-    float cutDirDeviation;
-    Vector3 cutPoint;
-    Vector3 cutNormal;
-    float cutDistanceToCenter;
-    float cutAngle;
-    float beforeCutRating;
-    float afterCutRating;
+  eventTime                    - float, song time of event.
+  spawnTime                    - float, spawn time of note.
+  eventType                    - int, good = 0, bad = 1, miss = 2, bomb = 3.
+  {                            - Cut info structure (only for Good and Bad!).
+    speedOK                    - bool, note was hit at passable speed.
+    directionOK                - bool, note was hit with correct direction.
+    saberTypeOK                - bool, note was hit with correct saber.
+    wasCutTooSoon              - bool, note was cut too soon.
+    saberSpeed                 - float, speed of the saber.
+    { x, y, z }                - 3 floats, saberDir, direction of the saber.
+    saberType                  - int, type of the saber (0 = left, 1 = right).
+    timeDeviation              - float, how far away the time hit was from the time expected.
+    cutDirDeviation            - float, how far away the cut direction was from the one expected.
+    { x, y, z }                - 3 floats, cutPoint, point at which the note was cut.
+    { x, y, z }                - 3 floats, cutNormal, cut normal vector.
+    cutDistanceToCenter        - float, distance from center of the note to the cut plane, to get the score 15 * (1 - Clamp01(cutDistanceToCenter / 0.3f)). With beforeCutRating and afterCutRating forms 115 score.
+    cutAngle                   - float, angle of the cut.
+    beforeCutRating            - float, angle rating before the cut. This rating is uncapped (can go over 1). 1 means 70 score.
+    afterCutRating             - float, angle rating after the cut. This rating is uncapped (can go over 1). 1 means 30 score.
   }
 }
 
-3                              - byte, wall events array start
-wallCount                      - int, wall events count
+3                              - byte, wall events array start.
+wallCount                      - int, wall events count.
 {
-  wallID                       - int, lineIndex*100 + obstacleType*10 + width
-  energy                       - float, energy at the end of event
-  time                         - float, song time of event 
-  spawnTime                    - float, spawn time of wall
+  wallID                       - int, lineIndex*100 + obstacleType*10 + width.
+  energy                       - float, energy at the end of event.
+  time                         - float, song time of event.
+  spawnTime                    - float, spawn time of wall.
 }
 
-4                              - byte, automatic height array start
-heightCount                    - int, height change events count
+4                              - byte, automatic height array start.
+heightCount                    - int, height change events count.
 {
-  height                       - float, height value
-  time                         - float, song time
+  height                       - float, height value.
+  time                         - float, song time.
 }
 
-5                              - byte, pause array start
-pauseCount                     - int, pauses count
+5                              - byte, pause array start.
+pauseCount                     - int, pauses count.
 {
-  duration                     - long, duration in seconds
-  time                         - float, pause start time
+  duration                     - long, duration in seconds.
+  time                         - float, pause start time.
 }
-6                              - byte, start of controller offsets, *OPTIONAL*
-{                              - Left hand structure
+6                              - byte, start of controller offsets, *OPTIONAL*.
+{                              - Left hand structure.
    {x, y, z}                   - 3 floats, position.
    {x, y, z, w}                - 4 floats, rotation.
 }
-{                              - Right hand structure
+{                              - Right hand structure.
    {x, y, z}                   - 3 floats, position.
    {x, y, z, w}                - 4 floats, rotation.
 }
-7                              - byte, start of user data, *OPTIONAL*
-userDataLength                 - int, length of userdata
+7                              - byte, start of user data, *OPTIONAL*.
+userDataLength                 - int, length of userdata.
 {
- content                       - byte, variable meaning
+ content                       - byte, variable meaning.
 }
 ```
 
@@ -146,9 +146,12 @@ Uses Little Endian!
 
 - byte, 1 byte
 - int, 4 bytes
+- long, 8 bytes
 - float, 4 bytes
 - bool, 1 byte
-- string, int (count) + count bytes 
+- string, int (count) + count bytes
+
+Rotations are stored as quaternions.
 
 # Legacy format (ScoreSaber based)
 
