@@ -43,15 +43,15 @@ Beat Saber open replay format.
   leftHanded                   - bool.
   height                       - float, static height.
 
-  startTime                    - float, song start time (practice mode).
-  failTime                     - float, song fail time (only if failed).
+  startTime                    - float, song start time (practice mode), seconds.
+  failTime                     - float, song fail time (only if failed), seconds.
   speed                        - float, song speed (practice mode).
 }
 
 1                              - byte, frames array start.
 framesCount                    - int, frames count.
 {                              - Frame structure.
-  time                         - float, song time.
+  time                         - float, song time, seconds.
   fps                          - int, player's FPS.
   {                            - Head structure.
     {x, y, z}                  - 3 floats, position.
@@ -80,8 +80,8 @@ noteCount                      - int, note events count.
         SliderTail = 5, 
         BurstSliderHead = 6, 
         BurstSliderElement = 7
-  eventTime                    - float, song time of event.
-  spawnTime                    - float, spawn time of note.
+  eventTime                    - float, song time of event, seconds.
+  spawnTime                    - float, spawn time of note, seconds.
   eventType                    - int, good = 0, bad = 1, miss = 2, bomb = 3.
   {                            - Cut info structure (only for Good and Bad!).
     speedOK                    - bool, note was hit at passable speed.
@@ -107,22 +107,22 @@ wallCount                      - int, wall events count.
 {
   wallID                       - int, lineIndex*100 + obstacleType*10 + width.
   energy                       - float, energy at the end of event.
-  time                         - float, song time of event.
-  spawnTime                    - float, spawn time of wall.
+  time                         - float, song time of event, seconds.
+  spawnTime                    - float, spawn time of wall, seconds.
 }
 
 4                              - byte, automatic height array start.
 heightCount                    - int, height change events count.
 {
   height                       - float, height value.
-  time                         - float, song time.
+  time                         - float, song time, seconds.
 }
 
 5                              - byte, pause array start.
 pauseCount                     - int, pauses count.
 {
   duration                     - long, duration in seconds.
-  time                         - float, pause start time.
+  time                         - float, pause start time, seconds.
 }
 6                              - byte, start of controller offsets, *OPTIONAL*.
 {                              - Left hand structure.
